@@ -3,7 +3,7 @@ from app.utils.security import verify_password, create_access_token
 from app.models.user import User
 from app.schemas.user_schema import UserRegister, UserLogin
 from app.utils.security import hash_password
-
+from fastapi.security import OAuth2PasswordRequestForm
 
 def register_user(user: UserRegister, db: Session):
 
@@ -26,8 +26,10 @@ def register_user(user: UserRegister, db: Session):
 
     return new_user
 
-def login_user(user_data: UserLogin, db: Session):
-    user = db.query(User).filter(User.email == user_data.email).first()
+def login_user(user_data: OAuth2PasswordRequestForm, db: Session):
+    user = db.query(User).filter(
+    User.email == user_data.username
+).first()
 
     if not user:
         return None
