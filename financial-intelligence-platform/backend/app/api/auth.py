@@ -1,9 +1,9 @@
+from app.schemas.user_schema import UserRegister, UserResponse, UserLogin
+from app.services.auth_service import register_user, login_user
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-
 from app.database.database import get_db
-from app.schemas.user_schema import UserRegister, UserResponse
-from app.services.auth_service import register_user
+
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -20,3 +20,15 @@ def register(user: UserRegister, db: Session = Depends(get_db)):
         )
 
     return new_user
+
+@router.post("/login")
+def login(user: UserLogin, db: Session = Depends(get_db)):
+    token = login_user(user, db)
+
+    if not token:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password"
+        )
+
+    return token
